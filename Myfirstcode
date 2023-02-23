@@ -1,0 +1,77 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+// Node class for Huffman tree
+class Node {
+public:
+    char ch;
+    int freq;
+    Node *left, *right;
+
+    Node(char c, int f) {
+        ch = c;
+        freq = f;
+        left = right = nullptr;
+    }
+};
+
+// Custom comparator for priority queue
+class compare {
+public:
+    bool operator()(Node* l, Node* r) {
+        return (l->freq > r->freq);
+    }
+};
+
+// Recursive function to print the Huffman codes of each character
+void printCodes(Node* root, string str) {
+    if (!root)
+        return;
+    if (root->ch != '$')
+        cout << root->ch << " : " << str << endl;
+    printCodes(root->left, str + "0");
+    printCodes(root->right, str + "1");
+}
+
+// Function to build a Huffman tree and print the Huffman codes of each character
+void buildHuffmanTree(string S, int f[], int n) {
+    // Create a priority queue to store the nodes of the Huffman tree
+    priority_queue<Node*, vector<Node*>, compare> pq;
+
+    // Create a leaf node for each character and add it to the priority queue
+    for (int i = 0; i < n; i++) {
+        Node* node = new Node(S[i], f[i]);
+        pq.push(node);
+    }
+
+    // Build the Huffman tree
+    while (pq.size() > 1) {
+        // Extract the two nodes with the lowest frequency
+        Node* left = pq.top();
+        pq.pop();
+        Node* right = pq.top();
+        pq.pop();
+
+        // Create a new internal node with the sum of the frequencies of the two nodes
+        Node* node = new Node('$', left->freq + right->freq);
+        node->left = left;
+        node->right = right;
+
+        // Add the new internal node to the priority queue
+        pq.push(node);
+    }
+
+    // Print the Huffman codes of each character
+    printCodes(pq.top(), "");
+}
+
+// Driver code
+int main() {
+    string S = "abcdef";
+    int f[] = {5, 9, 12, 13, 16, 45};
+    int n = sizeof(f) / sizeof(f[0]);
+
+    buildHuffmanTree(S, f, n);
+
+    return 0;
+}
